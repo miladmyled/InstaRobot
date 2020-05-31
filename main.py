@@ -20,7 +20,8 @@ browser = webdriver.Chrome(".\\files\\chromedriver.exe")
 browser.maximize_window()
 browser.implicitly_wait(20)
 
-login.awslogin()
+conn = login.awslogin.conn
+cursor = conn.cursor
 
 hreflist = []
 

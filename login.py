@@ -63,8 +63,7 @@ def instalogin():
 
         not_now.click()
 
-def awslogin():
+class awslogin:
     conn = mysql.connect(
         user=awsuser, password=awspass, host=awsserver, database=awsdatabase
     )
-    cursor = conn.cursor()
