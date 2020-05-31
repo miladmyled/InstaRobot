@@ -4,6 +4,8 @@ from time import sleep
 import pymysql as mysql
 import json
 
+
+# Read login info from config file (JSON)
 infolist = []
 with open('info.config', 'r') as f:
     for line in f:
@@ -19,13 +21,13 @@ awspass = awslogininfo["pass"]
 
 
 
-
+#Login into insta function
 def instalogin():
     browser = webdriver.Chrome(".\\files\\chromedriver.exe")
     browser.maximize_window()
     browser.implicitly_wait(20)
 
-
+    # If there is a cookie for successful login it reads from in and no login is needed
     # AFTER COOKIES
     try:
         browser.get("https://www.instagram.com")
@@ -38,7 +40,7 @@ def instalogin():
 
         not_now.click()
     except:
-        #Save Cookies
+        # If cookie is not available , login is made through user and password and new cookie file will be set
         browser.get('https://www.instagram.com/accounts/login/')
         user_name = browser.find_element_by_xpath("//div[@id='react-root']/section/main/div[1]/article/div[1]/div[1]/div["
                                                   "1]/form/div[2]/div[1]/label/input")
@@ -63,6 +65,7 @@ def instalogin():
 
         not_now.click()
 
+# AWS Connection
 class awslogin:
     conn = mysql.connect(
         user=awsuser, password=awspass, host=awsserver, database=awsdatabase
