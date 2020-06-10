@@ -2,30 +2,26 @@ import pickle
 from selenium import webdriver
 from time import sleep
 import pymysql as mysql
-import json
+import config
 
 
 # Read login info from config file (JSON)
-infolist = []
-with open('info.config', 'r') as f:
-    for line in f:
-        infolist.append(line)
-instalogininfo = json.loads(infolist[0])
-instaloginname = instalogininfo["name"]
-instaloginpass = instalogininfo["pass"]
-awslogininfo = json.loads(infolist[1])
-awsserver = awslogininfo["server"]
-awsdatabase = awslogininfo["database"]
-awsuser = awslogininfo["user"]
-awspass = awslogininfo["pass"]
+
+instaloginname = config.intalogin["name"]
+instaloginpass = config.intalogin["pass"]
+
+awsserver = config.awslogin["server"]
+awsdatabase = config.awslogin["database"]
+awsuser = config.awslogin["user"]
+awspass = config.awslogin["pass"]
 
 
+browser = webdriver.Chrome(".\\files\\chromedriver.exe")
+browser.maximize_window()
+browser.implicitly_wait(20)
 
 #Login into insta function
 def instalogin():
-    browser = webdriver.Chrome(".\\files\\chromedriver.exe")
-    browser.maximize_window()
-    browser.implicitly_wait(20)
 
     # If there is a cookie for successful login it reads from in and no login is needed
     # AFTER COOKIES
@@ -36,7 +32,7 @@ def instalogin():
             browser.add_cookie(cookie)
         browser.get("https://www.instagram.com")
 
-        not_now = browser.find_element_by_xpath("//div[@role='dialog']/div[1]/div[3]/button[2]")
+        not_now = browser.find_element_by_xpath("//div[@role='dialog']/div[1]/div[1]/div[3]/button[2]")
 
         not_now.click()
     except:

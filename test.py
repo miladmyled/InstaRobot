@@ -1,21 +1,8 @@
-from time import sleep
-from selenium.webdriver.common.keys import Keys
 import login
+from time import sleep
 from datetime import datetime
 
-
-
-
-# Defining main hashtags and second related hashtags
-mainTags = ['vancouver', 'britishcolumbia', 'vancity', 'northvancouver', 'bc', 'burnaby', 'coquitlam', 'Abbotsford', 'yvr', 'vancouverbc', 'surrey', 'vancitybuzz', 'vancouverisawesome', 'langley', 'vancityhype', 'newwestminster', 'vancouverfoodie', 'eastvan', 'yvreats', 'kelowna', 'vancouverisland', 'vancouverlife']
-# mainTags = ['vancouver', 'britishcolumbia', 'vancity']
-
-
-searchTags = ['wine', 'beer', 'whiskey', 'vodka', 'sparklingwine', 'champagne', 'tequila']
-# Login to AWS
 conn = login.awslogin.conn
-
-
 # Create Error Log Function
 def logerror(functionname, errortext):
     with conn.cursor() as cursor:
@@ -27,78 +14,18 @@ def logerror(functionname, errortext):
     # your changes.
     conn.commit()
 
-
 # Login in Instagram
 try:
     login.instalogin()
 except Exception as e:
     logerror("instalogin", e)
 
-
-
-
-hreflist = []
-
-# Search Each hashtag, scroll down te page to load more posts for 20 times and read href of each post from 5 posts in
-# a column and 3 in a row
-for x in mainTags:
-    try:
-        login.browser.get('https://www.instagram.com/explore/tags/' + x)
-        login.browser.find_element_by_tag_name('body').send_keys(Keys.HOME)
-        login.browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
-        sleep(3)
-    except Exception as e:
-        print(e)
-        logerror("main tags search", e)
-    for a in range(20):
-        # for a in range(5):
-        try:
-            login.browser.execute_script("window.scrollTo(0,document.body.scrollHeight)")
-            sleep(3)
-        except Exception as e:
-            print(e)
-            logerror("Scroll down", e)
-        for i in range(5):
-            # for i in range(1):
-            for j in range(3):
-                try:
-                    post = login.browser.find_element_by_xpath(
-                        "//div[@id='react-root']/section/main/article/div[2]/div[1]/div[" + str(i + 1) + "]/div[" + str(
-                            j + 1) + "]/a")
-                    hreflist.append(post.get_attribute("href"))
-                except Exception as e:
-                    print(e)
-                    logerror("element not attached", e)
-
-# Save all hrefs in a list and make them unique
-hreflist = list(set(hreflist))
 finalhreflist = []
-lenhreflist = len(list(set(hreflist)))
-print(lenhreflist)
+with open('result.txt') as my_file:
+    for line in my_file:
+        line = line[:-2]
+        finalhreflist.append(line)
 
-# Open each post and see if related keywords exist in post's caption or not , if exists save it in final list
-for hrf in hreflist:
-    login.browser.get(hrf)
-    sleep(1)
-    try:
-        post_text = login.browser.find_element_by_xpath(
-            "//div[@id='react-root']/section/main/div[1]/div[1]/article/div[2]/div[1]/ul/div[1]/li/div[1]/div[1]/div[2]/span").text
-        for st in searchTags:
-            if st in post_text:
-                finalhreflist.append(hrf)
-    except Exception as e:
-        print(e)
-        logerror('search tag post not available', e)
-        sleep(30)
-    print(lenhreflist)
-    lenhreflist -= 1
-
-# Make final list unique and save it to a text file
-finalhreflist = list(set(finalhreflist))
-print(len(list(set(finalhreflist))))
-with open('result.txt', 'w') as f:
-    for item in finalhreflist:
-        f.write("%s\n" % item)
 
 # Open each post on final list , go to the profile check if the profile exists in database or not , if not
 # follow it and save profile name , href and datetime in the database
@@ -125,9 +52,9 @@ for fhrf in finalhreflist:
                 "//div[@id='react-root']/section/main/div[1]/header/section/ul/li[3]/a/span").text)
         except :
             follower_count = 1001
-            follower_count = 1001
+            following_count = 1001
         sleep(2)
-        if follower_count < 1000 and following_count < 1000:
+        if follower_count < 1000 :
             try:
                 follow_btn = login.browser.find_element_by_xpath(
                     "//div[@id='react-root']/section/main/div[1]/header/section/div[1]/div[1]/span/span/button")
@@ -167,3 +94,4 @@ for fhrf in finalhreflist:
             except Exception as e:
                 print(e)
                 logerror("follow not available" , e)
+
